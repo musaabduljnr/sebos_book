@@ -1,0 +1,64 @@
+name: sebos_book
+description: A high-performance transaction recording app for mobile phone retailers.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Navigation
+  go_router: ^13.0.0
+
+  # State Management (User preference: Signals)
+  signals_flutter: ^5.0.0
+  
+  # Cloud Sync (Supabase)
+  supabase_flutter: ^2.4.0
+  
+  # Database (Offline-first, reactive)
+  isar: ^3.1.0
+  isar_flutter_libs: ^3.1.0
+  path_provider: ^2.1.2
+
+  # UI & Charts
+  fl_chart: ^0.66.0
+  lucide_icons: ^0.321.0
+  google_fonts: ^6.1.0
+  flutter_staggered_animations: ^1.1.1
+  flutter_animate: ^4.5.0
+  shimmer: ^3.0.0
+
+  # PDF & Printing
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
+  # Utils
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  
+  # Hardware (Simulation/Real)
+  mobile_scanner: ^3.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Generators for Isar
+  isar_generator: ^3.1.0
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
