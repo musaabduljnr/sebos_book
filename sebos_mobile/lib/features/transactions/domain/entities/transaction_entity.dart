@@ -34,6 +34,11 @@ class TransactionEntity {
   
   DateTime? updatedAt;
 
+  // Customer Information
+  late String? customerName;
+  late String customerPhone;
+  late String? customerAddress;
+
   // Computed fields
   double get profit => type == 'sale' ? salePrice - costPrice : 0;
 }

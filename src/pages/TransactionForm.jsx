@@ -28,6 +28,9 @@ export default function TransactionForm() {
     condition: 'Used',
     costPrice: '',
     salePrice: '',
+    customerName: '',
+    customerPhone: '',
+    customerAddress: '',
   });
 
   // Pre-fill if coming from inventory
@@ -213,33 +216,58 @@ export default function TransactionForm() {
               </p>
             </div>
 
-            {formData.type === 'sale' && (
-              <div className="input-group">
-                <label className="input-label">Sale Price (Customer)</label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    type="number" 
-                    className="input" 
-                    placeholder="0.00"
-                    value={formData.salePrice}
-                    onChange={e => updateForm('salePrice', e.target.value)}
-                  />
-                  <DollarSign size={18} className="text-muted" style={{ position: 'absolute', right: '12px', top: '12px' }} />
-                </div>
-                {formData.salePrice && formData.costPrice && (
-                  <div className={`badge ${formData.salePrice - formData.costPrice >= 0 ? 'badge--profit' : 'badge--loss'}`} style={{ alignSelf: 'flex-start' }}>
-                    Est. Profit: ₦{(formData.salePrice - formData.costPrice).toLocaleString()}
-                  </div>
-                )}
-              </div>
             )}
+            
+            <div className="divider" style={{ margin: 'var(--space-6) 0' }}></div>
+            
+            <h3 className="form-step__subtitle" style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)', color: 'var(--color-text-secondary)' }}>
+              Customer Information
+            </h3>
+
+            <div className="input-group">
+              <label className="input-label">Customer Name</label>
+              <input 
+                type="text" 
+                className="input" 
+                placeholder="Full Name"
+                value={formData.customerName}
+                onChange={e => updateForm('customerName', e.target.value)}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Phone Number *</label>
+              <input 
+                type="tel" 
+                className="input" 
+                placeholder="e.g. 08012345678"
+                value={formData.customerPhone}
+                onChange={e => updateForm('customerPhone', e.target.value.replace(/\D/g, ''))}
+                required
+              />
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
+                This field is mandatory.
+              </p>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Address</label>
+              <textarea 
+                className="input" 
+                placeholder="Customer's physical address"
+                value={formData.customerAddress}
+                onChange={e => updateForm('customerAddress', e.target.value)}
+                rows={2}
+                style={{ resize: 'none', padding: '12px' }}
+              />
+            </div>
 
             <div className="form-actions">
               <button className="btn btn--ghost" onClick={prevStep}><ArrowLeft size={18} /> Back</button>
               <button 
                 className="btn btn--primary btn--full" 
                 onClick={nextStep}
-                disabled={!formData.costPrice || (formData.type === 'sale' && !formData.salePrice)}
+                disabled={!formData.costPrice || (formData.type === 'sale' && !formData.salePrice) || !formData.customerPhone}
               >
                 Review <ArrowRight size={18} />
               </button>
@@ -275,20 +303,24 @@ export default function TransactionForm() {
                   <span className="review-item__label">Cost</span>
                   <span className="review-item__value">₦{Number(formData.costPrice).toLocaleString()}</span>
                 </div>
-                {formData.type === 'sale' && (
-                  <>
-                    <div className="review-item">
-                      <span className="review-item__label">Sale Price</span>
-                      <span className="review-item__value">₦{Number(formData.salePrice).toLocaleString()}</span>
-                    </div>
-                    <div className="review-item" style={{ borderBottom: 'none' }}>
-                      <span className="review-item__label">Profit</span>
-                      <span className="review-item__value" style={{ color: 'var(--color-success)' }}>
-                        ₦{(formData.salePrice - formData.costPrice).toLocaleString()}
-                      </span>
                     </div>
                   </>
                 )}
+                
+                <div className="review-divider" style={{ gridColumn: 'span 2', height: '1px', background: 'var(--color-border)', margin: 'var(--space-2) 0' }}></div>
+                
+                <div className="review-item">
+                  <span className="review-item__label">Customer</span>
+                  <span className="review-item__value">{formData.customerName || 'N/A'}</span>
+                </div>
+                <div className="review-item">
+                  <span className="review-item__label">Phone</span>
+                  <span className="review-item__value">{formData.customerPhone}</span>
+                </div>
+                <div className="review-item" style={{ borderBottom: 'none' }}>
+                  <span className="review-item__label">Address</span>
+                  <span className="review-item__value" style={{ fontSize: 'var(--text-xs)' }}>{formData.customerAddress || 'N/A'}</span>
+                </div>
               </div>
             </div>
 

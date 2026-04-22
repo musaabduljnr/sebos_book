@@ -5,62 +5,102 @@ import 'jspdf-autotable';
  * PDF Service — Digital Receipt Generation
  */
 
-export function generateReceipt(transaction) {
+export function generateReceipt(transaction, options = {}) {
+  const doc = createReceiptDoc(transaction);
+  
+  if (options.preview) {
+    return doc.output('dataurlstring');
+  }
+
+  const filename = `SebosBook_${transaction.type}_${transaction.imei || 'receipt'}.pdf`;
+  doc.save(filename);
+  return filename;
+}
+
+function createReceiptDoc(transaction) {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: [80, 200],
+    format: [80, 200], // Small roll format for mobile/thermal
   });
 
   const pageWidth = 80;
-  const margin = 6;
-  const contentWidth = pageWidth - margin * 2;
-  let y = 10;
+  const margin = 8;
+  let y = 12;
 
-  // Header
-  doc.setFontSize(14);
+  // --- Header & Branding ---
+  doc.setFontSize(16);
+  doc.setTextColor(0, 102, 204); // Accent Blue
   doc.setFont('helvetica', 'bold');
   doc.text('SEBOS BOOK', pageWidth / 2, y, { align: 'center' });
   y += 6;
 
   doc.setFontSize(7);
+  doc.setTextColor(100);
   doc.setFont('helvetica', 'normal');
-  doc.text('Mobile Phone Sales & Trade-Ins', pageWidth / 2, y, { align: 'center' });
+  doc.text('DIGITAL BUSINESS SOLUTIONS', pageWidth / 2, y, { align: 'center' });
   y += 8;
 
-  // Divider
-  doc.setDrawColor(200);
+  // Header Divider
+  doc.setDrawColor(220);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  // Receipt Identification
+  doc.setFontSize(10);
+  doc.setTextColor(30);
+  doc.setFont('helvetica', 'bold');
+  const typeLabel = transaction.type === 'sale' ? 'SALES RECEIPT' : 'TRADE-IN RECEIPT';
+  doc.text(typeLabel, pageWidth / 2, y, { align: 'center' });
+  y += 5;
+
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Ref: #SB-${String(transaction.id || Date.now()).slice(-6).toUpperCase()}`, pageWidth / 2, y, { align: 'center' });
+  y += 10;
+
+  // --- Customer Information ---
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('CUSTOMER DETAILS', margin, y);
+  y += 5;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  const customerFields = [
+    ['Name', transaction.customerName || 'N/A'],
+    ['Phone', transaction.customerPhone || 'N/A'],
+    ['Address', transaction.customerAddress || 'N/A'],
+  ];
+
+  customerFields.forEach(([label, value]) => {
+    doc.text(`${label}:`, margin, y);
+    doc.text(String(value), margin + 15, y);
+    y += 4;
+  });
+  y += 4;
+
+  // --- Transaction Details ---
+  doc.setDrawColor(240);
   doc.line(margin, y, pageWidth - margin, y);
   y += 6;
 
-  // Transaction Type
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  const typeLabel = transaction.type === 'sale' ? 'SALE RECEIPT' : 'TRADE-IN RECEIPT';
-  doc.text(typeLabel, pageWidth / 2, y, { align: 'center' });
-  y += 8;
+  doc.text('TRANSACTION DETAILS', margin, y);
+  y += 6;
 
-  // Details
   const details = [
     ['Date', new Date(transaction.createdAt || transaction.date).toLocaleDateString('en-GB', {
       day: '2-digit', month: 'short', year: 'numeric',
     })],
-    ['Time', new Date(transaction.createdAt || Date.now()).toLocaleTimeString('en-GB', {
-      hour: '2-digit', minute: '2-digit',
-    })],
-    ['Phone', transaction.phoneModel],
+    ['Brand', transaction.brand],
+    ['Model', transaction.phoneModel],
     ['IMEI', transaction.imei],
     ['Condition', transaction.condition],
-    ['Brand', transaction.brand],
   ];
 
-  if (transaction.type === 'sale') {
-    details.push(['Sale Price', formatCurrency(transaction.salePrice)]);
-  } else {
-    details.push(['Trade-In Value', formatCurrency(transaction.costPrice)]);
-  }
-
-  doc.setFontSize(8);
   details.forEach(([label, value]) => {
     doc.setFont('helvetica', 'normal');
     doc.text(label + ':', margin, y);
@@ -69,48 +109,43 @@ export function generateReceipt(transaction) {
     y += 5;
   });
 
-  y += 3;
-  doc.setDrawColor(200);
+  y += 4;
+  doc.setDrawColor(30);
   doc.line(margin, y, pageWidth - margin, y);
-  y += 6;
+  y += 8;
 
-  // Total
+  // --- Pricing Summary ---
+  doc.setFontSize(12);
+  doc.setTextColor(0);
+  doc.setFont('helvetica', 'bold');
+  
   if (transaction.type === 'sale') {
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TOTAL', margin, y);
+    doc.text('TOTAL AMOUNT', margin, y);
     doc.text(formatCurrency(transaction.salePrice), pageWidth - margin, y, { align: 'right' });
-    y += 4;
-
-    const profit = transaction.salePrice - transaction.costPrice;
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Profit: ${formatCurrency(profit)}`, pageWidth - margin, y, { align: 'right' });
-    y += 8;
   } else {
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('PAID', margin, y);
+    doc.text('PAID TO CUSTOMER', margin, y);
     doc.text(formatCurrency(transaction.costPrice), pageWidth - margin, y, { align: 'right' });
-    y += 8;
   }
+  
+  y += 12;
 
-  // Footer
+  // --- Professional Footer ---
   doc.setDrawColor(200);
   doc.setLineDashPattern([1, 1]);
   doc.line(margin, y, pageWidth - margin, y);
   y += 6;
 
   doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Thank you for your business!', pageWidth / 2, y, { align: 'center' });
+  doc.setTextColor(100);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Thank you for choosing Sebos Book.', pageWidth / 2, y, { align: 'center' });
   y += 4;
-  doc.text(`Ref: SB-${String(transaction.id || Date.now()).slice(-6)}`, pageWidth / 2, y, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.text('Terms: All sales are final. 7 days warranty included.', pageWidth / 2, y, { align: 'center' });
+  y += 4;
+  doc.text('This is a computer-generated receipt.', pageWidth / 2, y, { align: 'center' });
 
-  // Save
-  const filename = `SebosBook_${transaction.type}_${transaction.imei || 'receipt'}.pdf`;
-  doc.save(filename);
-  return filename;
+  return doc;
 }
 
 function formatCurrency(amount) {

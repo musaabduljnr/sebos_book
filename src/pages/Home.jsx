@@ -7,6 +7,7 @@ import ProgressRing from '../components/ProgressRing';
 import TrendChart from '../components/TrendChart';
 import TransactionCard from '../components/TransactionCard';
 import SkeletonLoader, { CardSkeleton, ChartSkeleton } from '../components/SkeletonLoader';
+import EmptyDashboard from '../components/EmptyDashboard';
 import './Home.css';
 
 function formatCurrency(amount) {
@@ -24,6 +25,12 @@ export default function Home() {
 
   const profitGoal = 50000; // Mock daily goal
   const profitProgress = dailyStats ? (dailyStats.totalProfit / profitGoal) * 100 : 0;
+
+  const isEmpty = !dashLoading && !activityLoading && stockCount === 0 && activity.length === 0;
+
+  if (isEmpty) {
+    return <EmptyDashboard />;
+  }
 
   return (
     <div className="home-page animate-fade-in">

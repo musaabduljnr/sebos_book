@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { calculateProfit } from '../services/transactionService';
-import { generateReceipt } from '../services/pdfService';
+import ReceiptPreview from './ReceiptPreview';
 import './TransactionCard.css';
 
 function formatCurrency(amount) {
@@ -14,12 +14,13 @@ function formatCurrency(amount) {
 }
 
 export default function TransactionCard({ transaction, style }) {
+  const [showPreview, setShowPreview] = React.useState(false);
   const isSale = transaction.type === 'sale';
   const profit = calculateProfit(transaction);
   const amount = isSale ? transaction.salePrice : transaction.costPrice;
 
   const handleClick = () => {
-    generateReceipt(transaction);
+    setShowPreview(true);
   };
 
   return (
@@ -49,6 +50,12 @@ export default function TransactionCard({ transaction, style }) {
           </div>
         )}
       </div>
+      
+      <ReceiptPreview 
+        isOpen={showPreview} 
+        onClose={() => setShowPreview(false)} 
+        transaction={transaction} 
+      />
     </div>
   );
 }

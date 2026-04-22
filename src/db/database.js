@@ -3,9 +3,9 @@ import { supabase } from '../lib/supabase';
 
 const db = new Dexie('SebosBookDB');
 
-// Updated schema with sync metadata
-db.version(2).stores({
-  transactions: '++id, type, phoneModel, imei, condition, costPrice, salePrice, date, brand, createdAt, isSynced, serverId, updatedAt',
+// Updated schema with sync metadata and customer info
+db.version(3).stores({
+  transactions: '++id, type, phoneModel, imei, condition, costPrice, salePrice, date, brand, createdAt, isSynced, serverId, updatedAt, customerName, customerPhone, customerAddress',
   inventory: '++id, phoneModel, imei, condition, costPrice, brand, status, addedAt, isSynced, serverId, updatedAt',
 }).upgrade(tx => {
   // Simple upgrade logic if needed
@@ -144,7 +144,10 @@ export async function seedDemoData() {
         date: txDate.toISOString().split('T')[0],
         createdAt: txDate.toISOString(),
         isSynced: 1, // Demo data is local only or "synced"
-        updatedAt: txDate.toISOString()
+        updatedAt: txDate.toISOString(),
+        customerName: ['John Doe', 'Sarah Smith', 'Michael Chen', 'Amaka Okoro', 'Blessing Udoh'][Math.floor(Math.random() * 5)],
+        customerPhone: '080' + Math.floor(10000000 + Math.random() * 90000000),
+        customerAddress: 'No ' + Math.floor(Math.random() * 100) + ' Business District, Lagos, Nigeria'
       });
     }
   }

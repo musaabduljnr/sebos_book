@@ -24,6 +24,9 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   String _condition = 'Used';
   final _costController = TextEditingController();
   final _saleController = TextEditingController();
+  final _customerNameController = TextEditingController();
+  final _customerPhoneController = TextEditingController();
+  final _customerAddressController = TextEditingController();
 
   final List<String> _brands = ['Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi', 'Tecno', 'Infinix', 'itel', 'Oppo', 'Redmi', 'Other'];
   final List<String> _conditions = ['New', 'Used'];
@@ -38,7 +41,10 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
       ..costPrice = double.tryParse(_costController.text) ?? 0
       ..salePrice = _type == 'sale' ? (double.tryParse(_saleController.text) ?? 0) : 0
       ..date = DateTime.now()
-      ..createdAt = DateTime.now();
+      ..createdAt = DateTime.now()
+      ..customerName = _customerNameController.text
+      ..customerPhone = _customerPhoneController.text
+      ..customerAddress = _customerAddressController.text;
 
     await _txRepo.addTransaction(tx);
     if (mounted) {
@@ -56,6 +62,9 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
          _imeiController.clear();
          _costController.clear();
          _saleController.clear();
+         _customerNameController.clear();
+         _customerPhoneController.clear();
+         _customerAddressController.clear();
        });
     }
   }
@@ -73,6 +82,15 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
         elevation: 0,
         connectorColor: const MaterialStatePropertyAll(Colors.white10),
         onStepContinue: () {
+          if (_currentStep == 2) {
+             // Validate mandatory phone on Step 2 (Pricing + Customer Info)
+             if (_customerPhoneController.text.isEmpty) {
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(content: Text('Customer Phone Number is mandatory'), backgroundColor: AppTheme.error)
+               );
+               return;
+             }
+          }
           if (_currentStep < 3) {
             setState(() => _currentStep++);
           } else {
@@ -242,6 +260,27 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
               keyboardType: TextInputType.number,
             ),
           ],
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 16),
+          Text('Customer Information', style: AppTheme.darkTheme.textTheme.titleMedium?.copyWith(color: AppTheme.accentBlue)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _customerNameController,
+            decoration: const InputDecoration(labelText: 'Customer Name', hintText: 'Full Name'),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _customerPhoneController,
+            decoration: const InputDecoration(labelText: 'Phone Number *', hintText: 'e.g. 08012345678'),
+            keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _customerAddressController,
+            decoration: const InputDecoration(labelText: 'Address', hintText: 'Physical address'),
+            maxLines: 2,
+          ),
         ],
       ),
     );
@@ -272,6 +311,13 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
                 _buildReviewRow('Cost', currencyFormat.format(double.tryParse(_costController.text) ?? 0)),
                 if (_type == 'sale')
                   _buildReviewRow('Sale Price', currencyFormat.format(double.tryParse(_saleController.text) ?? 0)),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(color: Colors.white10),
+                ),
+                _buildReviewRow('Customer', _customerNameController.text.isEmpty ? 'N/A' : _customerNameController.text),
+                _buildReviewRow('Phone', _customerPhoneController.text),
+                _buildReviewRow('Address', _customerAddressController.text.isEmpty ? 'N/A' : _customerAddressController.text),
               ],
             ),
           ),
