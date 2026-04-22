@@ -1,8 +1,8 @@
-# Sebos Book 📱
+# Sebos Book 
 
 **Sebos Book** is a premium digital management and bookkeeping solution specifically designed for mobile phone retailers and technicians. It simplifies the complexity of tracking multi-brand inventory, sales, and trade-ins with an elegant, professional interface.
 
-## 🚀 Key Features
+## Key Features
 
 - **Omni-channel Management**: Seamlessly manage your business across **Web** and **Mobile** (Android/iOS).
 - **Offline-First Sync**: Powered by a robust synchronization layer that works offline and syncs to the cloud (Supabase) when you're back online.
@@ -11,7 +11,7 @@
 - **Real-time Analytics**: Monitor daily profits, weekly revenue trends, and stock health at a glance.
 - **Secure Data**: Industry-standard authentication and data encryption to keep your business records safe.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Web Frontend**: [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
 - **Mobile App**: [Flutter](https://flutter.dev/)
@@ -19,7 +19,7 @@
 - **Backend & Sync**: [Supabase](https://supabase.com/) (PostgreSQL + Auth).
 - **PDF Engine**: [jsPDF](https://github.com/parallax/jsPDF).
 
-## 📦 Getting Started
+## Getting Started
 
 ### Web Application
 1. Install dependencies: `npm install`
