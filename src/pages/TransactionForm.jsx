@@ -215,8 +215,6 @@ export default function TransactionForm() {
                 Amount spent obtaining this device.
               </p>
             </div>
-
-            )}
             
             <div className="divider" style={{ margin: 'var(--space-6) 0' }}></div>
             
@@ -303,8 +301,11 @@ export default function TransactionForm() {
                   <span className="review-item__label">Cost</span>
                   <span className="review-item__value">₦{Number(formData.costPrice).toLocaleString()}</span>
                 </div>
-                    </div>
-                  </>
+                {formData.type === 'sale' && (
+                  <div className="review-item">
+                    <span className="review-item__label">Sale Price</span>
+                    <span className="review-item__value">₦{Number(formData.salePrice).toLocaleString()}</span>
+                  </div>
                 )}
                 
                 <div className="review-divider" style={{ gridColumn: 'span 2', height: '1px', background: 'var(--color-border)', margin: 'var(--space-2) 0' }}></div>
