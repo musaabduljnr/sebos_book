@@ -35,11 +35,7 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     async function init() {
-      try {
-        await seedDemoData();
-      } catch (e) {
-        console.error('DB init error:', e);
-      }
+      // Automatic seeding removed to start from zero as requested.
       dispatch({ type: 'SET_LOADING', payload: false });
     }
     init();

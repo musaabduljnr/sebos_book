@@ -176,4 +176,9 @@ export async function seedDemoData() {
   await db.inventory.bulkAdd(inventoryItems);
 }
 
+export async function clearDatabase() {
+  await db.transactions.clear();
+  await db.inventory.clear();
+}
+
 export default db;

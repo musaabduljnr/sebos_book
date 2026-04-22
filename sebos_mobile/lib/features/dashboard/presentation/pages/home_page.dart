@@ -247,6 +247,28 @@ class HomePage extends StatelessWidget {
             color: AppTheme.success,
             onTap: () => Navigator.pushNamed(context, '/inventory'),
           ),
+          const SizedBox(height: 32),
+          TextButton.icon(
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: AppTheme.cardBg,
+                  title: const Text('Reset Application?', style: TextStyle(color: Colors.white)),
+                  content: const Text('This will delete all local transactions and inventory.', style: TextStyle(color: AppTheme.textSecondary)),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                    TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Reset', style: TextStyle(color: Colors.red))),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await IsarDatabase.clearAll();
+              }
+            },
+            icon: const Icon(LucideIcons.refreshCcw, size: 14, color: AppTheme.textMuted),
+            label: const Text('Wipe All local Data', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+          ),
         ],
       ),
     );

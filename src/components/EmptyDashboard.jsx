@@ -5,11 +5,15 @@ import {
   Smartphone, 
   PlusCircle, 
   TrendingUp, 
-  ShieldCheck 
+  ShieldCheck,
+  RefreshCcw
 } from 'lucide-react';
+import { clearDatabase } from '../db/database';
+import { useApp } from '../context/AppContext';
 import './EmptyDashboard.css';
 
 export default function EmptyDashboard() {
+  const { triggerRefresh } = useApp();
   return (
     <div className="empty-dashboard animate-fade-in">
       <div className="empty-dashboard__hero">
@@ -51,9 +55,23 @@ export default function EmptyDashboard() {
         </div>
       </div>
 
-      <div className="empty-dashboard__footer card card--flat">
-        <ShieldCheck size={20} className="text-success" />
-        <p>Your data is securely stored and synced to the cloud.</p>
+      <div className="empty-dashboard__footer card card--flat" style={{ border: 'none', background: 'transparent', gap: 'var(--space-6)' }}>
+        <div className="empty-dashboard__footer-info">
+          <ShieldCheck size={20} className="text-success" />
+          <p>Your data is securely stored and synced to the cloud.</p>
+        </div>
+        <button 
+          className="btn btn--secondary btn--sm" 
+          onClick={async () => {
+            if (window.confirm('This will permanently delete all local transactions and inventory. Continue?')) {
+              await clearDatabase();
+              triggerRefresh();
+            }
+          }}
+          style={{ opacity: 0.7, fontSize: 'var(--text-xs)' }}
+        >
+          <RefreshCcw size={14} /> Wipe Current Data
+        </button>
       </div>
     </div>
   );
